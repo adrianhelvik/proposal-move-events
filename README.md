@@ -38,7 +38,7 @@ element.onmove = class Move {
 ```
 
 Live example:
-[https://adrianhelvik.github.io/proposal-move-events/](Github Pages - Proposal move events)
+https://adrianhelvik.github.io/proposal-move-events
 
 ## No proper move events
 
