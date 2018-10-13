@@ -3,14 +3,15 @@
   <meta charset="utf-8">
 </head>
 <body>
-  <pre id="log"></pre>
-  <div id="div">
+  <div>
     Hello there
   </div>
   <script type="module">
     import { polyfill } from './src/index.js'
 
     polyfill()
+
+    const div = document.querySelector('div')
 
     div.moveHandler = class Move {
       onStart(event) {
