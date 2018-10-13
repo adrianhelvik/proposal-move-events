@@ -7,13 +7,7 @@ list them here. So I'll fix them instead.
 # Usage
 
 ```javascript
-import { polyfill } from './src/index.js'
-
-polyfill()
-
-const div = document.querySelector('div')
-
-div.moveHandler = class Move {
+element.moveHandler = class Move {
   onStart(event) {
     event.preventDefault()
     this.snapshot = document.createSnapshot(this.element)
