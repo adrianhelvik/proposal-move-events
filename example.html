@@ -1,14 +1,19 @@
 <!doctype html>
 <head>
   <meta charset="utf-8">
+<style>
+.outer .inner {
+  background: #ddd;
+  padding: 20px;
+}
+
+</style>
 </head>
 <body>
-  <div style="
-    background: #ddd;
-    padding: 20px;
-    font-family: sans-serif;
-  ">
-    Drag me!
+  <div class="outer">
+    <div class="inner">
+      Drag me!
+    </div>
   </div>
   <script type="module">
     import { polyfill } from './src/index.js'
@@ -21,6 +26,7 @@
       onStart(event) {
         event.preventDefault()
         this.snapshot = document.createSnapshot(this.element)
+        this.element.style.opacity = 0
         this.snapshot.place({
           x: event.clientX - event.insetX,
           y: event.clientY - event.insetY,
@@ -35,6 +41,7 @@
       }
 
       onEnd(event) {
+        this.element.style.opacity = 1
         this.snapshot.remove()
       }
     }

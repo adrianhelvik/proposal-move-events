@@ -1,3 +1,5 @@
+import cloneNode from './cloneNode.js'
+
 export function polyfill() {
   document.createSnapshot = createSnapshot
 }
@@ -9,12 +11,11 @@ function createSnapshot(element) {
 class Snapshot {
   constructor(element) {
     this.element = element
-    this.clone = this.element.cloneNode(true)
+    this.clone = cloneNode(this.element)
     this.clone.style.position = 'fixed'
     this.clone.style.left = 0
     this.clone.style.top = 0
-    this.clone.style.width = this.element.clientWidth + 'px'
-    this.clone.style.height = this.element.clientHeight + 'px'
+    this.clone.style.pointerEvents = 'none'
   }
 
   place({ x, y }) {
