@@ -21,7 +21,6 @@ class Snapshot {
   }
 
   move({ x, y }) {
-    console.log(x, y)
     this.clone.style.transform = `translateX(${x}px) translateY(${y}px)`
   }
 
