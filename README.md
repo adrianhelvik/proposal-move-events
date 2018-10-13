@@ -37,6 +37,9 @@ element.onmove = class Move {
 }
 ```
 
+Live example:
+[https://adrianhelvik.github.io/proposal-move-events/](Github Pages - Proposal move events)
+
 ## No proper move events
 
 HTML5 drag'n'drop events are not a pleasure to use, so we
