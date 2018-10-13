@@ -1,8 +1,8 @@
-# Drag'n'drop: it's a drag... No more!
+# Move events proposal
 
-Okay. Implementing drag'n'drop interfaces sucks. There are
+Okay. Implementing drag'n'drop interfaces is tedious. There are
 too many problems with how it is normally done for me to
-list them here. So I'll fix it instead.
+list them here. So I'll fix them instead. 
 
 # Usage
 
