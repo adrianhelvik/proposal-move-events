@@ -13,6 +13,8 @@ class Snapshot {
     this.clone.style.position = 'fixed'
     this.clone.style.left = 0
     this.clone.style.top = 0
+    this.clone.style.width = this.element.clientWidth + 'px'
+    this.clone.style.height = this.element.clientHeight + 'px'
   }
 
   place({ x, y }) {
