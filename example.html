@@ -2,11 +2,13 @@
 <head>
   <meta charset="utf-8">
 <style>
+body > :first-child {
+  font-family: sans-serif;
+}
 .outer .inner {
   background: #ddd;
   padding: 20px;
 }
-
 </style>
 </head>
 <body>
@@ -28,15 +30,15 @@
         this.snapshot = document.createSnapshot(this.element)
         this.element.style.opacity = 0
         this.snapshot.place({
-          x: event.clientX - event.insetX,
-          y: event.clientY - event.insetY,
+          x: event.snapshotX,
+          y: event.snapshotY
         })
       }
 
       onMove(event) {
         this.snapshot.move({
-          x: event.clientX - event.insetX,
-          y: event.clientY - event.insetY,
+          x: event.snapshotX,
+          y: event.snapshotY,
         })
       }
 

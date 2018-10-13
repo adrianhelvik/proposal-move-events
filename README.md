@@ -4,6 +4,39 @@ Okay. Implementing drag'n'drop interfaces sucks. There are
 too many problems with how it is normally done for me to
 list them here. So I'll fix it instead.
 
+# Usage
+
+```javascript
+element.onmove = class Move {
+  onStart(event) {
+    this.startEvent = event
+    this.snapshot = document.createSnapshot(this.element)
+    this.snapshot.place({
+      x: this.snapshotX,
+      y: this.snapshotY,
+    })
+  }
+
+  onMove(event) {
+    this.snapshot.move({
+      x: event.snapshotX,
+      y: event.snapshotY,
+    })
+  }
+
+  onEnd() {
+    this.snapshot.move({
+      x: this.startEvent.snapshotX,
+      y: this.startEvent.snapshotY,
+      transition: 300,
+    })
+    setTimeout(() => {
+      this.snapshot.remove()
+    }, 300)
+  }
+}
+```
+
 ## No proper move events
 
 HTML5 drag'n'drop events are not a pleasure to use, so we
@@ -131,70 +164,4 @@ except that it is not visible in the DOM.
 
 ## Snapshot coordinates in the move handler
 
-All is well when stuff is simple to use, right?
-The formula for x and y using drag'n'drop today
-looks like this:
-
-```javascript
-let rect
-element.ontouchstart = function (event) {
-  rect = element.getBoundingClientRect()
-  
-}
-
-element.ontouchmove = function (event) {
-  element.style.
-}
-```
-
-
-```
- ----------------------------------
-|            |                     |
-|            |                     |
-|            | insetY              |
-|            |                     |
-|   insetX   |                     |
-|------------X - the touched point |
-|                                  |
-|                                  |
-|                                  |
-|                                  |
-|                                  |
- ----------------------------------
-
-
-```
-
-
-```javascript
-element.onmove = class Move {
-  onStart(event) {
-    this.startEvent = event
-    this.snapshot = document.createSnapshot(this.element)
-    this.snapshot.place({
-      x: this.snapshotX,
-      y: this.snapshotY,
-    })
-  }
-
-  onMove(event) {
-    this.snapshot.move({
-      x: event.snapshotX,
-      y: event.snapshotY,
-    })
-  }
-
-  onEnd() {
-    this.snapshot.move({
-      x: this.startEvent.snapshotX,
-      y: this.startEvent.snapshotY,
-      transition: 300,
-    })
-    setTimeout(() => {
-      this.snapshot.remove()
-    }, 300)
-  }
-}
-```
-
+...

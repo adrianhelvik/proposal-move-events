@@ -152,7 +152,7 @@ class MoveEvent {
     instance.extractInfoFromTouch(touch)
     instance.preventDefault = () =>
       event.preventDefault()
-    instance.determineInsets()
+    instance.setDerivedProperties()
     return instance
     return instance
   }
@@ -164,7 +164,7 @@ class MoveEvent {
     instance.element = element
     const touch = event.touches[touchIndex]
     instance.extractInfoFromTouch(touch)
-    instance.determineInsets()
+    instance.setDerivedProperties()
     return instance
   }
 
@@ -175,7 +175,7 @@ class MoveEvent {
     instance.element = element
     const touch = previousEvent.touches[touchIndex]
     instance.extractInfoFromTouch(touch)
-    instance.determineInsets()
+    instance.setDerivedProperties()
     return instance
   }
 
@@ -187,7 +187,7 @@ class MoveEvent {
     instance.extractInfoFromMouseEvent(event)
     instance.preventDefault = () =>
       event.preventDefault()
-    instance.determineInsets()
+    instance.setDerivedProperties()
     return instance
   }
 
@@ -197,7 +197,7 @@ class MoveEvent {
     instance.initialClientY = initialClientY
     instance.element = element
     instance.extractInfoFromMouseEvent(event)
-    instance.determineInsets()
+    instance.setDerivedProperties()
     return instance
   }
 
@@ -207,7 +207,7 @@ class MoveEvent {
     instance.initialClientY = initialClientY
     instance.element = element
     instance.extractInfoFromMouseEvent(event)
-    instance.determineInsets()
+    instance.setDerivedProperties()
     return instance
   }
 
@@ -221,10 +221,12 @@ class MoveEvent {
     this.clientY = event.clientY
   }
 
-  determineInsets() {
+  setDerivedProperties() {
     const rect = this.element.getBoundingClientRect()
     this.insetX = this.initialClientX - rect.left
     this.insetY = this.initialClientY - rect.top
+    this.snapshotX = this.clientX - this.insetX
+    this.snapshotY = this.clientY - this.insetY
   }
 }
 
