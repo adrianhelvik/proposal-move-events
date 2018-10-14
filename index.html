@@ -29,6 +29,9 @@ body > :first-child {
         event.preventDefault()
         this.snapshot = document.createSnapshot(this.element)
         this.element.style.opacity = 0
+        this.element.style.pointerEvents = 'none'
+        this.initialX = event.snapshotX
+        this.initialY = event.snapshotY
         this.snapshot.place({
           x: event.snapshotX,
           y: event.snapshotY
@@ -43,8 +46,16 @@ body > :first-child {
       }
 
       onEnd(event) {
-        this.element.style.opacity = 1
-        this.snapshot.remove()
+        this.snapshot.move({
+          x: this.initialX,
+          y: this.initialY,
+          transition: 300,
+        })
+        setTimeout(() => {
+          this.element.style.pointerEvents = null
+          this.element.style.opacity = null
+          this.snapshot.remove()
+        }, 300)
       }
     }
   </script>

@@ -23,7 +23,8 @@ class Snapshot {
     document.body.appendChild(this.clone)
   }
 
-  move({ x, y }) {
+  move({ x, y, transition = 0 }) {
+    this.clone.style.transition = `transform ${transition}ms`
     this.clone.style.transform = `translateX(${x}px) translateY(${y}px)`
   }
 
