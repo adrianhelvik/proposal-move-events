@@ -46,6 +46,11 @@ function getMoveHandler(element) {
 }
 
 function mountMoveHandler(element, Move) {
+  if (! element[_touchmove_]) {
+    element[_touchmove_] = []
+    element[_touchend_] = []
+  }
+
   element.addEventListener('touchstart', element[_touchstart_] = event => {
     const move = initializeTouchMove(Move, event, element)
     const touchIndex = event.touches.length - 1
@@ -56,22 +61,30 @@ function mountMoveHandler(element, Move) {
     if (typeof move.onStart === 'function')
       move.onStart(MoveEvent.fromTouchStart(event, element, touchIndex, initialClientX, initialClientY))
 
-    document.addEventListener('touchmove', element[_touchmove_] = event => {
+    let touchmove
+    document.addEventListener('touchmove', touchmove = event => {
       previousEvent = event
       if (typeof move.onMove === 'function')
         move.onMove(MoveEvent.fromTouchMove(event, element, touchIndex, initialClientX, initialClientY))
     })
+    element[_touchmove_].push(touchmove)
 
-    document.addEventListener('touchend', element[_touchend_] = event => {
+    let touchend
+    document.addEventListener('touchend', touchend = event => {
       if (event.touches.length === touchIndex) {
-        document.removeEventListener('touchmove', element[_touchmove_])
-        element[_touchmove_] = null
-        document.removeEventListener('touchend', element[_touchend_])
-        element[_touchend_] = null
+        document.removeEventListener('touchmove',touchmove)
+        let index = element[_touchmove_].indexOf(touchmove)
+        if (index !== -1)
+          element[_touchmove_].splice(index, 1)
+        document.removeEventListener('touchend', touchend)
+        index = element[_touchend_].indexOf(touchend)
+        if (index !== -1)
+          element[_touchend_].splice(index, -1)
         if (typeof move.onEnd === 'function')
           move.onEnd(MoveEvent.fromTouchEnd(event, element, touchIndex, previousEvent, initialClientX, initialClientY))
       }
     })
+    element[_touchend_].push(touchend)
   }, supportsPassive ? { passive: false } : false)
 
   element.addEventListener('mousedown', element[_mousedown_] = event => {
@@ -104,16 +117,26 @@ function unmountMoveHandler(element) {
     element[_touchstart_] = null
   }
   if (element[_touchmove_]) {
-    element.removeEventListener('touchstart', element[_touchmove_])
+    for (let handler of element[_touchmove_])
+      element.removeEventListener('touchmove', handler)
     element[_touchmove_] = null
   }
   if (element[_touchend_]) {
-    element.removeEventListener('touchstart', element[_touchend_])
+    for (let handler of element[_touchend_])
+      element.removeEventListener('touchend', element[_touchend_])
     element[_touchend_] = null
   }
   if (element[_mousedown_]) {
     element.removeEventListener('mousedown', element[_mousedown_])
     element[_mousedown_] = null
+  }
+  if (element[_mousemove_]) {
+    element.removeEventListener('mousemove', element[_mousemove_])
+    element[_mousemove_] = null
+  }
+  if (element[_mouseup_]) {
+    element.removeEventListener('mousemove', element[_mouseup_])
+    element[_mouseup_] = null
   }
   moveHandlers.delete(element)
 }
