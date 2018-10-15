@@ -4,49 +4,6 @@ Okay. Implementing drag'n'drop interfaces is tedious. There are
 too many problems with how it is normally done for me to
 list them here. So I'll fix them instead. 
 
-# Usage as ponyfill
-
-Use this in production, not the polyfill. The polyfill is
-only intended as a demo of how this could be used if the
-proposal is standardized.
-
-```javascript
-import { setMoveHandler, createSnapshot } from 'move-events-proposal'
-
-setMoveHandler(element, class Move {
-  onStart(event) {
-    event.preventDefault()
-    this.snapshot = createSnapshot(this.element)
-    this.element.style.opacity = 0
-    this.initialX = event.snapshotX
-    this.initialY = event.snapshotY
-    this.snapshot.place({
-      x: event.snapshotX,
-      y: event.snapshotY
-    })
-  }
-
-  onMove(event) {
-    this.snapshot.move({
-      x: event.snapshotX,
-      y: event.snapshotY,
-    })
-  }
-
-  onEnd(event) {
-    this.snapshot.move({
-      x: this.initialX,
-      y: this.initialY,
-      transition: 300
-    })
-    setTimeout(() => {
-      this.element.style.opacity = 1
-      this.snapshot.remove()
-    }, 300)
-  }
-})
-```
-
 # Usage as polyfill
 
 ```javascript
@@ -90,6 +47,49 @@ element.moveHandler = class Move {
 
 Live example:
 https://adrianhelvik.github.io/proposal-move-events
+
+# Usage as ponyfill
+
+Use this in production, not the polyfill. The polyfill is
+only intended as a demo of how this could be used if the
+proposal is standardized.
+
+```javascript
+import { setMoveHandler, createSnapshot } from 'move-events-proposal'
+
+setMoveHandler(element, class Move {
+  onStart(event) {
+    event.preventDefault()
+    this.snapshot = createSnapshot(this.element)
+    this.element.style.opacity = 0
+    this.initialX = event.snapshotX
+    this.initialY = event.snapshotY
+    this.snapshot.place({
+      x: event.snapshotX,
+      y: event.snapshotY
+    })
+  }
+
+  onMove(event) {
+    this.snapshot.move({
+      x: event.snapshotX,
+      y: event.snapshotY,
+    })
+  }
+
+  onEnd(event) {
+    this.snapshot.move({
+      x: this.initialX,
+      y: this.initialY,
+      transition: 300
+    })
+    setTimeout(() => {
+      this.element.style.opacity = 1
+      this.snapshot.remove()
+    }, 300)
+  }
+})
+```
 
 ## No proper move events
 
