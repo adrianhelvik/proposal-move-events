@@ -1,0 +1,12 @@
+{
+  "name": "proposal-move-events",
+  "version": "1.0.0",
+  "main": "dist.js",
+  "repository": "https://github.com/adrianhelvik/proposal-move-events.git",
+  "author": "Adrian Helvik <adrian.helvik@specifique.no>",
+  "license": "MIT",
+  "scripts": {
+    "build": "npx rollup src/index.js --format cjs --file dist.js",
+    "prepublish": "npm run build"
+  }
+}

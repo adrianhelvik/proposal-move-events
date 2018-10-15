@@ -17,6 +17,7 @@ body > :first-child {
       Drag me!
     </div>
   </div>
+  <button onclick="toggleDrag()">Toggle drag</button>
   <script type="module">
     import { polyfill } from './src/index.js'
 
@@ -24,8 +25,9 @@ body > :first-child {
 
     const div = document.querySelector('div')
 
-    div.moveHandler = class Move {
+    class Move {
       onStart(event) {
+        console.log('onStart')
         event.preventDefault()
         this.snapshot = document.createSnapshot(this.element)
         this.element.style.opacity = 0
@@ -39,6 +41,7 @@ body > :first-child {
       }
 
       onMove(event) {
+        console.log('onMove')
         this.snapshot.move({
           x: event.snapshotX,
           y: event.snapshotY,
@@ -46,6 +49,7 @@ body > :first-child {
       }
 
       onEnd(event) {
+        console.log('onEnd')
         this.snapshot.move({
           x: this.initialX,
           y: this.initialY,
@@ -57,6 +61,15 @@ body > :first-child {
           this.snapshot.remove()
         }, 300)
       }
+    }
+
+    div.moveHandler = Move
+
+    window.toggleDrag = function toggleDrag() {
+      if (div.moveHandler)
+        div.moveHandler = null
+      else
+        div.moveHandler = Move
     }
   </script>
 </body>

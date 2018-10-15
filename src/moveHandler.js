@@ -41,7 +41,6 @@ function setMoveHandler(element, Move) {
 }
 
 function getMoveHandler(element) {
-  unmountMoveHandler(element)
   return moveHandlers.get(element)
 }
 
@@ -91,19 +90,18 @@ function mountMoveHandler(element, Move) {
     const move = initializeMouseMove(Move, event, element)
 
     const { clientX: initialClientX, clientY: initialClientY } = event
-    let previousEvent = event
 
     if (typeof move.onStart === 'function')
       move.onStart(MoveEvent.fromMouseDown(event, element, initialClientX, initialClientY))
 
     document.addEventListener('mousemove', element[_mousemove_] = event => {
-      previousEvent = event
       if (typeof move.onMove === 'function')
         move.onMove(MoveEvent.fromMouseMove(event, element, initialClientX, initialClientY))
     })
 
     document.addEventListener('mouseup', element[_mouseup_] = event => {
       document.removeEventListener('mousemove', element[_mousemove_])
+      document.removeEventListener('mouseup', element[_mouseup_])
       element[_mousemove_] = null
       if (typeof move.onEnd === 'function')
         move.onEnd(MoveEvent.fromMouseUp(event, element, initialClientX, initialClientY))
@@ -118,12 +116,12 @@ function unmountMoveHandler(element) {
   }
   if (element[_touchmove_]) {
     for (let handler of element[_touchmove_])
-      element.removeEventListener('touchmove', handler)
+      document.removeEventListener('touchmove', handler)
     element[_touchmove_] = null
   }
   if (element[_touchend_]) {
     for (let handler of element[_touchend_])
-      element.removeEventListener('touchend', element[_touchend_])
+      document.removeEventListener('touchend', handler)
     element[_touchend_] = null
   }
   if (element[_mousedown_]) {
@@ -131,11 +129,11 @@ function unmountMoveHandler(element) {
     element[_mousedown_] = null
   }
   if (element[_mousemove_]) {
-    element.removeEventListener('mousemove', element[_mousemove_])
+    document.removeEventListener('mousemove', element[_mousemove_])
     element[_mousemove_] = null
   }
   if (element[_mouseup_]) {
-    element.removeEventListener('mousemove', element[_mouseup_])
+    document.removeEventListener('mouseup', element[_mouseup_])
     element[_mouseup_] = null
   }
   moveHandlers.delete(element)
