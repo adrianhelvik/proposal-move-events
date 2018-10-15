@@ -31,7 +31,7 @@ const _mousemove_ = Symbol('move/mousemove')
 const _mouseup_ = Symbol('move/mouseup')
 const moveHandlers = new WeakMap()
 
-export function setMoveHandler(element, Move) {
+function setMoveHandler(element, Move) {
   if (moveHandlers.has(element))
     unmountMoveHandler(element, Move)
   if (Move) {
@@ -40,7 +40,7 @@ export function setMoveHandler(element, Move) {
   }
 }
 
-export function getMoveHandler(element) {
+function getMoveHandler(element) {
   return moveHandlers.get(element)
 }
 
