@@ -4,14 +4,22 @@ Okay. Implementing drag'n'drop interfaces is tedious. There are
 too many problems with how it is normally done for me to
 list them here. So I'll fix them instead. 
 
-# Usage
+# Usage as ponyfill
+
+Use this in production, not the polyfill. The polyfill is
+only intended as a demo of how this could be used if the
+proposal is standardized.
 
 ```javascript
-element.moveHandler = class Move {
+import { setMoveHandler, createSnapshot } from 'move-events-proposal'
+
+setMoveHandler(element, class Move {
   onStart(event) {
     event.preventDefault()
-    this.snapshot = document.createSnapshot(this.element)
+    this.snapshot = createSnapshot(this.element)
     this.element.style.opacity = 0
+    this.initialX = event.snapshotX
+    this.initialY = event.snapshotY
     this.snapshot.place({
       x: event.snapshotX,
       y: event.snapshotY
@@ -26,8 +34,56 @@ element.moveHandler = class Move {
   }
 
   onEnd(event) {
-    this.element.style.opacity = 1
-    this.snapshot.remove()
+    this.snapshot.move({
+      x: this.initialX,
+      y: this.initialY,
+      transition: 300
+    })
+    setTimeout(() => {
+      this.element.style.opacity = 1
+      this.snapshot.remove()
+    }, 300)
+  }
+})
+```
+
+# Usage as polyfill
+
+```javascript
+import { polyfill } from 'move-events-proposal'
+
+polyfill()
+
+element.moveHandler = class Move {
+  onStart(event) {
+    event.preventDefault()
+    this.snapshot = document.createSnapshot(this.element)
+    this.element.style.opacity = 0
+    this.initialX = event.snapshotX
+    this.initialY = event.snapshotY
+    this.snapshot.place({
+      x: event.snapshotX,
+      y: event.snapshotY
+    })
+  }
+
+  onMove(event) {
+    this.snapshot.move({
+      x: event.snapshotX,
+      y: event.snapshotY,
+    })
+  }
+
+  onEnd(event) {
+    this.snapshot.move({
+      x: this.initialX,
+      y: this.initialY,
+      transition: 300,
+    })
+    setTimeout(() => {
+      this.element.style.opacity = 1
+      this.snapshot.remove()
+    }, 300)
   }
 }
 ```
@@ -113,53 +169,5 @@ layout. Positioning and overflow can make it impossible.
 ...
 
 ### Problem 4 - It is cumbersome to access the element beneath the original element
-
-...
-
-### The solution
-
-```javascript
-
-// First we create a snapshot. This
-// is a pixel perfect duplicate of
-// the element. Snapshots are opaque.
-// Meaning that you can't extract
-// any information about the contents
-// of the snapshot. Think of it as
-// an image.
-const snapshot = document.createSnapshot(element)
-
-// Then we place it on the screen.
-// This does not have too trigger
-// a layout reflow, as it is merely
-// a picture. It will also have
-// the exact same dimensions as the
-// original element.
-
-// using place({ x, y })
-snapshot.place({ x: 100, y: 200 })
-
-// using place({ x, y, width, height })
-snapshot.place({ x: 100, y: 200, width: 100, height: 400 })
-
-// And assuming that the element
-// has changed, we can simply update
-// the snapshot to match the original
-// element. This would probaly be a
-// common way to do that.
-element.style.opacity = 1
-snapshot.update()
-element.style.opacity = 0
-
-// And when we want to remove the
-// snapshot, that is simple as well.
-snapshot.remove()
-```
-
-Snapshots do not interact with the user in any way.
-A snapshot acts like an image with `pointer-events: none;`
-except that it is not visible in the DOM.
-
-## Snapshot coordinates in the move handler
 
 ...

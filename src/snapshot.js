@@ -4,7 +4,7 @@ export function polyfill() {
   document.createSnapshot = createSnapshot
 }
 
-function createSnapshot(element) {
+export function createSnapshot(element) {
   return new Snapshot(element)
 }
 
