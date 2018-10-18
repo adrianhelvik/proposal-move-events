@@ -175,7 +175,6 @@ class MoveEvent {
       event.preventDefault()
     instance.setDerivedProperties()
     return instance
-    return instance
   }
 
   static fromTouchMove(event, element, touchIndex, initialClientX, initialClientY) {
