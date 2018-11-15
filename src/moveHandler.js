@@ -50,7 +50,7 @@ function mountMoveHandler(element, Move) {
     element[_touchend_] = []
   }
 
-  element.addEventListener('touchstart', element[_touchstart_] = event => {
+  element.addEventListener('touchstart', element[_touchstart_] = function (event) {
     var move = initializeTouchMove(Move, event, element)
     var touchIndex = event.touches.length - 1
 
@@ -61,7 +61,7 @@ function mountMoveHandler(element, Move) {
       move.onStart(MoveEvent.fromTouchStart(event, element, touchIndex, initialClientX, initialClientY))
 
     var touchmove
-    document.addEventListener('touchmove', touchmove = event => {
+    document.addEventListener('touchmove', touchmove = function (event) {
       previousEvent = event
       if (typeof move.onMove === 'function')
         move.onMove(MoveEvent.fromTouchMove(event, element, touchIndex, initialClientX, initialClientY))
@@ -69,7 +69,7 @@ function mountMoveHandler(element, Move) {
     element[_touchmove_].push(touchmove)
 
     var touchend
-    document.addEventListener('touchend', touchend = event => {
+    document.addEventListener('touchend', touchend = function (event) {
       if (event.touches.length === touchIndex) {
         document.removeEventListener('touchmove',touchmove)
         var index = element[_touchmove_].indexOf(touchmove)
@@ -86,7 +86,7 @@ function mountMoveHandler(element, Move) {
     element[_touchend_].push(touchend)
   }, supportsPassive ? { passive: false } : false)
 
-  element.addEventListener('mousedown', element[_mousedown_] = event => {
+  element.addEventListener('mousedown', element[_mousedown_] = function (event) {
     var move = initializeMouseMove(Move, event, element)
 
     var { clientX: initialClientX, clientY: initialClientY } = event
@@ -94,12 +94,12 @@ function mountMoveHandler(element, Move) {
     if (typeof move.onStart === 'function')
       move.onStart(MoveEvent.fromMouseDown(event, element, initialClientX, initialClientY))
 
-    document.addEventListener('mousemove', element[_mousemove_] = event => {
+    document.addEventListener('mousemove', element[_mousemove_] = function (event) {
       if (typeof move.onMove === 'function')
         move.onMove(MoveEvent.fromMouseMove(event, element, initialClientX, initialClientY))
     })
 
-    document.addEventListener('mouseup', element[_mouseup_] = event => {
+    document.addEventListener('mouseup', element[_mouseup_] = function (event) {
       document.removeEventListener('mousemove', element[_mousemove_])
       document.removeEventListener('mouseup', element[_mouseup_])
       element[_mousemove_] = null
@@ -177,8 +177,9 @@ MoveEvent.fromTouchStart = function (event, element, touchIndex, initialClientX,
   instance.element = element
   var touch = event.touches[touchIndex]
   instance.extractInfoFromTouch(touch)
-  instance.preventDefault = () =>
+  instance.preventDefault = function () {
     event.preventDefault()
+  }
   instance.setDerivedProperties()
   return instance
 }
@@ -211,8 +212,9 @@ MoveEvent.fromMouseDown = function (event, element, initialClientX, initialClien
   instance.initialClientY = initialClientY
   instance.element = element
   instance.extractInfoFromMouseEvent(event)
-  instance.preventDefault = () =>
+  instance.preventDefault = function () {
     event.preventDefault()
+  }
   instance.setDerivedProperties()
   return instance
 }
