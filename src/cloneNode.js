@@ -1,17 +1,17 @@
 export default function cloneNode(original) {
   switch (original.nodeType) {
     case Node.ELEMENT_NODE:
-      const clone = document.createElement(original.tagName)
-      const computedStyle = getComputedStyle(original)
+      var clone = document.createElement(original.tagName)
+      var computedStyle = getComputedStyle(original)
 
-      for (let key in computedStyle) {
+      for (var key in computedStyle) {
         if (computedStyle.hasOwnProperty(key)) {
           if (! /^[0-9]+$/.test(key))
             clone.style[key] = computedStyle[key]
         }
       }
 
-      for (let i = 0; i < original.childNodes.length; i++)
+      for (var i = 0; i < original.childNodes.length; i++)
         clone.appendChild(cloneNode(original.childNodes[i]))
 
       return clone
