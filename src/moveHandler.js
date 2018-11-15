@@ -166,6 +166,8 @@ function def(object, property, value) {
 }
 
 function MoveEvent() {
+  if (! (this instanceof MoveEvent))
+    throw Error("Constructor cannot be invoked without 'new'")
 }
 
 MoveEvent.fromTouchStart = function (event, element, touchIndex, initialClientX, initialClientY) {
