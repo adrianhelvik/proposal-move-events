@@ -1,12 +1,14 @@
-function polyfill(options = {}) {
+function polyfill(options) {
+  if (! options)
+    options = {}
   if (! options.force && HTMLElement.prototype.hasOwnProperty('moveHandler'))
     return console.warn('moveHandler is already implemented. Not polyfilling. Call polyfill({ force: true }) to polyfill anyways.')
 
   Object.defineProperty(HTMLElement.prototype, 'moveHandler', {
-    get() {
+    get: function () {
       return getMoveHandler(this)
     },
-    set(moveHandler) {
+    set: function (moveHandler) {
       return setMoveHandler(this, moveHandler)
     }
   })
@@ -54,7 +56,8 @@ function mountMoveHandler(element, Move) {
     var move = initializeTouchMove(Move, event, element)
     var touchIndex = event.touches.length - 1
 
-    var { clientX: initialClientX, clientY: initialClientY } = event.touches[touchIndex]
+    var initialClientY = event.touches[touchIndex].clientX
+    var initialClientY = event.touches[touchIndex].clientY
     var previousEvent = event
 
     if (typeof move.onStart === 'function')
@@ -89,7 +92,8 @@ function mountMoveHandler(element, Move) {
   element.addEventListener('mousedown', element[_mousedown_] = function (event) {
     var move = initializeMouseMove(Move, event, element)
 
-    var { clientX: initialClientX, clientY: initialClientY } = event
+    var initialClientX = event.clientX
+    var initialClientY = event.clientY
 
     if (typeof move.onStart === 'function')
       move.onStart(MoveEvent.fromMouseDown(event, element, initialClientX, initialClientY))
@@ -159,7 +163,7 @@ function initializeMouseMove(Move, event, element) {
 
 function def(object, property, value) {
   Object.defineProperty(object, property, {
-    value,
+    value: value,
     configurable: false,
     writable: false,
   })

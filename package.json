@@ -1,6 +1,6 @@
 {
   "name": "proposal-move-events",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "main": "dist.js",
   "repository": "https://github.com/adrianhelvik/proposal-move-events.git",
   "author": "Adrian Helvik <adrian.helvik@specifique.no>",

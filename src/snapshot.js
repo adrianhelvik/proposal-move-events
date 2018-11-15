@@ -4,7 +4,8 @@ export function polyfill() {
   document.createSnapshot = createSnapshot
 }
 
-export function createSnapshot(element, containerElement = document.body) {
+export function createSnapshot(element, containerElement) {
+  containerElement = containerElement || document.body
   return new Snapshot(element, containerElement)
 }
 
@@ -28,14 +29,19 @@ function Snapshot (element, containerElement) {
   this.clone.style.zIndex = 2147483647
 }
 
-Snapshot.prototype.place = function ({ x, y }) {
-  this.move({ x, y })
+Snapshot.prototype.place = function (options) {
+  if (! options)
+    options = {}
+  this.move({ x: options.x, y: options.y })
   this.containerElement.appendChild(this.clone)
 }
 
-Snapshot.prototype.move = function ({ x, y, transition = 0 }) {
-  this.clone.style.transition = `transform ${transition}ms`
-  this.clone.style.transform = `translateX(${x}px) translateY(${y}px)`
+Snapshot.prototype.move = function (options) {
+  var x = options.x
+  var y = options.y
+  var transition = options.transition || 0
+  this.clone.style.transition = 'transform ' + transition + 'ms'
+  this.clone.style.transform = 'translateX(' + x + 'px) translateY(' + y + 'px)'
 }
 
 Snapshot.prototype.remove = function () {
