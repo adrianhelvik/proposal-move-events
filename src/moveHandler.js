@@ -56,7 +56,7 @@ function mountMoveHandler(element, Move) {
     var move = initializeTouchMove(Move, event, element)
     var touchIndex = event.touches.length - 1
 
-    var initialClientY = event.touches[touchIndex].clientX
+    var initialClientX = event.touches[touchIndex].clientX
     var initialClientY = event.touches[touchIndex].clientY
     var previousEvent = event
 
