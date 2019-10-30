@@ -102,18 +102,17 @@ So I propose a new way to handle this...
 ## Moves
 
 An important rationale behind moves is that a move has a
-start, a duration and an end. For mouse events that is okay.
+start, a duration and an end. For mouse events, mousemove,
+mousedown and mouseup works okay.
+
 There is only one mouse, so you can easily add an event
 for mousedown, mousemove and mouseup (using the APIs however...).
 
-For touch events however, we can have multiple touches.
-How should we handle that? We have to store the index of
-the touchstart for use in touchmove (or as most people do,
-just use event.touches[0]). Touches are stateful and the
-current abstraction encourages abuse. Let's create a
-better one!
+For touch events however, we have to handle multiple touches.
+From what I've seen online the majority of usage is subtly incorrect.
+Often relying on event.touches[0].
 
-Lets call the abstraction a move. A move has a start, a
+Lets create an abstraction around a move. A move has a start, a
 beginning and an end and shares data between these three
 states. What a perfect use case for classes.
 
