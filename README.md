@@ -7,7 +7,7 @@ list them here. So I'll fix them instead.
 # Usage as polyfill
 
 ```javascript
-import { polyfill } from 'move-events-proposal'
+import { polyfill } from 'proposal-move-events'
 
 polyfill()
 
@@ -55,7 +55,7 @@ only intended as a demo of how this could be used if the
 proposal is standardized.
 
 ```javascript
-import { setMoveHandler, createSnapshot } from 'move-events-proposal'
+import { setMoveHandler, createSnapshot } from 'proposal-move-events'
 
 setMoveHandler(element, class Move {
   onStart(event) {
