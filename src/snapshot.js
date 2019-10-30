@@ -9,8 +9,8 @@ export function createSnapshot(element, containerElement) {
   return new Snapshot(element, containerElement)
 }
 
-function Snapshot (element, containerElement) {
-  if (! (this instanceof Snapshot))
+function Snapshot(element, containerElement) {
+  if (!(this instanceof Snapshot))
     throw Error("Constructor cannot be invoked without 'new'")
 
   this.containerElement = containerElement
@@ -29,14 +29,13 @@ function Snapshot (element, containerElement) {
   this.clone.style.zIndex = 2147483647
 }
 
-Snapshot.prototype.place = function (options) {
-  if (! options)
-    options = {}
+Snapshot.prototype.place = function(options) {
+  if (!options) options = {}
   this.move({ x: options.x, y: options.y })
   this.containerElement.appendChild(this.clone)
 }
 
-Snapshot.prototype.move = function (options) {
+Snapshot.prototype.move = function(options) {
   var x = options.x
   var y = options.y
   var transition = options.transition || 0
@@ -44,6 +43,6 @@ Snapshot.prototype.move = function (options) {
   this.clone.style.transform = 'translateX(' + x + 'px) translateY(' + y + 'px)'
 }
 
-Snapshot.prototype.remove = function () {
+Snapshot.prototype.remove = function() {
   this.clone.parentNode.removeChild(this.clone)
 }

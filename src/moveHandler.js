@@ -1,28 +1,29 @@
 function polyfill(options) {
-  if (! options)
-    options = {}
-  if (! options.force && HTMLElement.prototype.hasOwnProperty('moveHandler'))
-    return console.warn('moveHandler is already implemented. Not polyfilling. Call polyfill({ force: true }) to polyfill anyways.')
+  if (!options) options = {}
+  if (!options.force && Node.prototype.hasOwnProperty('moveHandler'))
+    return console.warn(
+      'moveHandler is already implemented. Not polyfilling. Call polyfill({ force: true }) to polyfill anyways.',
+    )
 
-  Object.defineProperty(HTMLElement.prototype, 'moveHandler', {
-    get: function () {
+  Object.defineProperty(Node.prototype, 'moveHandler', {
+    get: function() {
       return getMoveHandler(this)
     },
-    set: function (moveHandler) {
+    set: function(moveHandler) {
       return setMoveHandler(this, moveHandler)
-    }
+    },
   })
 }
 
-var supportsPassive = false;
+var supportsPassive = false
 try {
   var opts = Object.defineProperty({}, 'passive', {
     get: function() {
       supportsPassive = true
-    }
+    },
   })
-  window.addEventListener("testPassive", null, opts)
-  window.removeEventListener("testPassive", null, opts)
+  window.addEventListener('testPassive', null, opts)
+  window.removeEventListener('testPassive', null, opts)
 } catch (e) {}
 
 var _touchstart_ = Symbol('move/touchstart')
@@ -34,8 +35,7 @@ var _mouseup_ = Symbol('move/mouseup')
 var moveHandlers = new WeakMap()
 
 function setMoveHandler(element, Move) {
-  if (moveHandlers.has(element))
-    unmountMoveHandler(element, Move)
+  if (moveHandlers.has(element)) unmountMoveHandler(element, Move)
   if (Move) {
     mountMoveHandler(element, Move)
     moveHandlers.set(element, Move)
@@ -47,70 +47,133 @@ function getMoveHandler(element) {
 }
 
 function mountMoveHandler(element, Move) {
-  if (! element[_touchmove_]) {
+  if (!element[_touchmove_]) {
     element[_touchmove_] = []
     element[_touchend_] = []
   }
 
-  element.addEventListener('touchstart', element[_touchstart_] = function (event) {
-    var move = initializeTouchMove(Move, event, element)
-    var touchIndex = event.touches.length - 1
+  element.addEventListener(
+    'touchstart',
+    (element[_touchstart_] = function(event) {
+      var move = initializeTouchMove(Move, event, element)
+      var touchIndex = event.touches.length - 1
 
-    var initialClientX = event.touches[touchIndex].clientX
-    var initialClientY = event.touches[touchIndex].clientY
-    var previousEvent = event
+      var initialClientX = event.touches[touchIndex].clientX
+      var initialClientY = event.touches[touchIndex].clientY
+      var previousEvent = event
 
-    if (typeof move.onStart === 'function')
-      move.onStart(MoveEvent.fromTouchStart(event, element, touchIndex, initialClientX, initialClientY))
+      if (typeof move.onStart === 'function')
+        move.onStart(
+          MoveEvent.fromTouchStart(
+            event,
+            element,
+            touchIndex,
+            initialClientX,
+            initialClientY,
+          ),
+        )
 
-    var touchmove
-    document.addEventListener('touchmove', touchmove = function (event) {
-      previousEvent = event
-      if (typeof move.onMove === 'function')
-        move.onMove(MoveEvent.fromTouchMove(event, element, touchIndex, initialClientX, initialClientY))
-    })
-    element[_touchmove_].push(touchmove)
+      var touchmove
+      document.addEventListener(
+        'touchmove',
+        (touchmove = function(event) {
+          previousEvent = event
+          if (typeof move.onMove === 'function')
+            move.onMove(
+              MoveEvent.fromTouchMove(
+                event,
+                element,
+                touchIndex,
+                initialClientX,
+                initialClientY,
+              ),
+            )
+        }),
+      )
+      element[_touchmove_].push(touchmove)
 
-    var touchend
-    document.addEventListener('touchend', touchend = function (event) {
-      if (event.touches.length === touchIndex) {
-        document.removeEventListener('touchmove',touchmove)
-        var index = element[_touchmove_].indexOf(touchmove)
-        if (index !== -1)
-          element[_touchmove_].splice(index, 1)
-        document.removeEventListener('touchend', touchend)
-        index = element[_touchend_].indexOf(touchend)
-        if (index !== -1)
-          element[_touchend_].splice(index, -1)
-        if (typeof move.onEnd === 'function')
-          move.onEnd(MoveEvent.fromTouchEnd(event, element, touchIndex, previousEvent, initialClientX, initialClientY))
-      }
-    })
-    element[_touchend_].push(touchend)
-  }, supportsPassive ? { passive: false } : false)
+      var touchend
+      document.addEventListener(
+        'touchend',
+        (touchend = function(event) {
+          if (event.touches.length === touchIndex) {
+            document.removeEventListener('touchmove', touchmove)
+            var index = element[_touchmove_].indexOf(touchmove)
+            if (index !== -1) element[_touchmove_].splice(index, 1)
+            document.removeEventListener('touchend', touchend)
+            index = element[_touchend_].indexOf(touchend)
+            if (index !== -1) element[_touchend_].splice(index, -1)
+            if (typeof move.onEnd === 'function')
+              move.onEnd(
+                MoveEvent.fromTouchEnd(
+                  event,
+                  element,
+                  touchIndex,
+                  previousEvent,
+                  initialClientX,
+                  initialClientY,
+                ),
+              )
+          }
+        }),
+      )
+      element[_touchend_].push(touchend)
+    }),
+    supportsPassive ? { passive: false } : false,
+  )
 
-  element.addEventListener('mousedown', element[_mousedown_] = function (event) {
-    var move = initializeMouseMove(Move, event, element)
+  element.addEventListener(
+    'mousedown',
+    (element[_mousedown_] = function(event) {
+      var move = initializeMouseMove(Move, event, element)
 
-    var initialClientX = event.clientX
-    var initialClientY = event.clientY
+      var initialClientX = event.clientX
+      var initialClientY = event.clientY
 
-    if (typeof move.onStart === 'function')
-      move.onStart(MoveEvent.fromMouseDown(event, element, initialClientX, initialClientY))
+      if (typeof move.onStart === 'function')
+        move.onStart(
+          MoveEvent.fromMouseDown(
+            event,
+            element,
+            initialClientX,
+            initialClientY,
+          ),
+        )
 
-    document.addEventListener('mousemove', element[_mousemove_] = function (event) {
-      if (typeof move.onMove === 'function')
-        move.onMove(MoveEvent.fromMouseMove(event, element, initialClientX, initialClientY))
-    })
+      document.addEventListener(
+        'mousemove',
+        (element[_mousemove_] = function(event) {
+          if (typeof move.onMove === 'function')
+            move.onMove(
+              MoveEvent.fromMouseMove(
+                event,
+                element,
+                initialClientX,
+                initialClientY,
+              ),
+            )
+        }),
+      )
 
-    document.addEventListener('mouseup', element[_mouseup_] = function (event) {
-      document.removeEventListener('mousemove', element[_mousemove_])
-      document.removeEventListener('mouseup', element[_mouseup_])
-      element[_mousemove_] = null
-      if (typeof move.onEnd === 'function')
-        move.onEnd(MoveEvent.fromMouseUp(event, element, initialClientX, initialClientY))
-    })
-  })
+      document.addEventListener(
+        'mouseup',
+        (element[_mouseup_] = function(event) {
+          document.removeEventListener('mousemove', element[_mousemove_])
+          document.removeEventListener('mouseup', element[_mouseup_])
+          element[_mousemove_] = null
+          if (typeof move.onEnd === 'function')
+            move.onEnd(
+              MoveEvent.fromMouseUp(
+                event,
+                element,
+                initialClientX,
+                initialClientY,
+              ),
+            )
+        }),
+      )
+    }),
+  )
 }
 
 function unmountMoveHandler(element) {
@@ -119,13 +182,13 @@ function unmountMoveHandler(element) {
     element[_touchstart_] = null
   }
   if (element[_touchmove_]) {
-    element[_touchmove_].forEach(function (handler) {
+    element[_touchmove_].forEach(function(handler) {
       document.removeEventListener('touchmove', handler)
     })
     element[_touchmove_] = null
   }
   if (element[_touchend_]) {
-    element[_touchend_].forEach(function (handler) {
+    element[_touchend_].forEach(function(handler) {
       document.removeEventListener('touchend', handler)
     })
     element[_touchend_] = null
@@ -170,25 +233,37 @@ function def(object, property, value) {
 }
 
 function MoveEvent() {
-  if (! (this instanceof MoveEvent))
+  if (!(this instanceof MoveEvent))
     throw Error("Constructor cannot be invoked without 'new'")
 }
 
-MoveEvent.fromTouchStart = function (event, element, touchIndex, initialClientX, initialClientY) {
+MoveEvent.fromTouchStart = function(
+  event,
+  element,
+  touchIndex,
+  initialClientX,
+  initialClientY,
+) {
   var instance = new MoveEvent()
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
   instance.element = element
   var touch = event.touches[touchIndex]
   instance.extractInfoFromTouch(touch)
-  instance.preventDefault = function () {
+  instance.preventDefault = function() {
     event.preventDefault()
   }
   instance.setDerivedProperties()
   return instance
 }
 
-MoveEvent.fromTouchMove = function (event, element, touchIndex, initialClientX, initialClientY) {
+MoveEvent.fromTouchMove = function(
+  event,
+  element,
+  touchIndex,
+  initialClientX,
+  initialClientY,
+) {
   var instance = new MoveEvent()
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
@@ -199,7 +274,14 @@ MoveEvent.fromTouchMove = function (event, element, touchIndex, initialClientX, 
   return instance
 }
 
-MoveEvent.fromTouchEnd = function (event, element, touchIndex, previousEvent, initialClientX, initialClientY) {
+MoveEvent.fromTouchEnd = function(
+  event,
+  element,
+  touchIndex,
+  previousEvent,
+  initialClientX,
+  initialClientY,
+) {
   var instance = new MoveEvent()
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
@@ -210,20 +292,30 @@ MoveEvent.fromTouchEnd = function (event, element, touchIndex, previousEvent, in
   return instance
 }
 
-MoveEvent.fromMouseDown = function (event, element, initialClientX, initialClientY) {
+MoveEvent.fromMouseDown = function(
+  event,
+  element,
+  initialClientX,
+  initialClientY,
+) {
   var instance = new MoveEvent()
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
   instance.element = element
   instance.extractInfoFromMouseEvent(event)
-  instance.preventDefault = function () {
+  instance.preventDefault = function() {
     event.preventDefault()
   }
   instance.setDerivedProperties()
   return instance
 }
 
-MoveEvent.fromMouseMove = function (event, element, initialClientX, initialClientY) {
+MoveEvent.fromMouseMove = function(
+  event,
+  element,
+  initialClientX,
+  initialClientY,
+) {
   var instance = new MoveEvent()
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
@@ -233,7 +325,12 @@ MoveEvent.fromMouseMove = function (event, element, initialClientX, initialClien
   return instance
 }
 
-MoveEvent.fromMouseUp = function (event, element, initialClientX, initialClientY) {
+MoveEvent.fromMouseUp = function(
+  event,
+  element,
+  initialClientX,
+  initialClientY,
+) {
   var instance = new MoveEvent()
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
@@ -243,17 +340,17 @@ MoveEvent.fromMouseUp = function (event, element, initialClientX, initialClientY
   return instance
 }
 
-MoveEvent.prototype.extractInfoFromTouch = function (touch) {
+MoveEvent.prototype.extractInfoFromTouch = function(touch) {
   this.clientX = touch.clientX
   this.clientY = touch.clientY
 }
 
-MoveEvent.prototype.extractInfoFromMouseEvent = function (event) {
+MoveEvent.prototype.extractInfoFromMouseEvent = function(event) {
   this.clientX = event.clientX
   this.clientY = event.clientY
 }
 
-MoveEvent.prototype.setDerivedProperties = function () {
+MoveEvent.prototype.setDerivedProperties = function() {
   var rect = this.element.getBoundingClientRect()
   this.insetX = this.initialClientX - rect.left
   this.insetY = this.initialClientY - rect.top
@@ -261,9 +358,4 @@ MoveEvent.prototype.setDerivedProperties = function () {
   this.snapshotY = this.clientY - this.insetY
 }
 
-export {
-  setMoveHandler,
-  getMoveHandler,
-  MoveEvent,
-  polyfill
-}
+export { setMoveHandler, getMoveHandler, MoveEvent, polyfill }

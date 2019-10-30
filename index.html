@@ -9,21 +9,41 @@ body > :first-child {
   background: #ddd;
   padding: 20px;
 }
+#svg-target {
+  min-height: 20px;
+  min-width: 20px;
+  outline: 3px solid cyan;
+}
 </style>
 </head>
 <body>
   <div class="outer">
     <div class="inner">
-      Drag me!
+      <svg width="20" height="20" style="vertical-align: middle">
+        <circle cx="10" cy="10" r="8" stroke="black" stroke-width="3" fill="green" />
+      </svg>
+      <span style="display: inline-block; vertical-align: middle">
+        Drag me!
+      </span>
     </div>
   </div>
-  <button onclick="toggleDrag()">Toggle drag</button>
+  <button onclick="toggleDrag(window.draggable)">Toggle drag</button>
+  <div>
+    <h3>Svg source</h3>
+    <svg width="100" height="100" id="svg-source">
+      <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+    </svg>
+  </div>
+  <div>
+    <h3>Svg target (created using cloneNode)</h3>
+    <div id="svg-target"></div>
+  </div>
   <script type="module">
-    import { polyfill } from './src/index.js'
+    import { polyfill, cloneNode } from './src/index.js'
 
     polyfill()
 
-    const div = document.querySelector('div')
+    window.draggable = document.querySelector('.outer')
 
     class Move {
       onStart(event) {
@@ -63,13 +83,17 @@ body > :first-child {
       }
     }
 
-    div.moveHandler = Move
+    draggable.moveHandler = Move
 
-    window.toggleDrag = function toggleDrag() {
-      if (div.moveHandler)
-        div.moveHandler = null
+    window.toggleDrag = function toggleDrag(draggable) {
+      if (draggable.moveHandler)
+        draggable.moveHandler = null
       else
-        div.moveHandler = Move
+        draggable.moveHandler = Move
     }
+
+    document.getElementById('svg-target').appendChild(cloneNode(document.getElementById('svg-source')))
+
+    document.getElementById('svg-source').moveHandler = Move
   </script>
 </body>
