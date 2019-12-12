@@ -131,3 +131,8 @@ it. Naming things is hard! But here it goes.
 ```javascript
 element.moveHandler = Move
 ```
+
+# Caveats
+This polyfill does not clone `::before` and `::after` pseudo
+elements. To make it usable for me, I've whitelisted class names
+from Font Awesome.

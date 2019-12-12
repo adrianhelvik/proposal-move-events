@@ -1,4 +1,4 @@
-import cloneNode from './cloneNode.js'
+import cloneNode from './cloneNode/index.js'
 
 export function polyfill() {
   document.createSnapshot = createSnapshot
