@@ -253,7 +253,7 @@ MoveEvent.fromTouchStart = function(
   instance.preventDefault = function() {
     event.preventDefault()
   }
-  instance.cancelable = event.cancelable
+  instance.cancelable = event.cancelable !== false
   instance.setDerivedProperties()
   return instance
 }
@@ -307,7 +307,7 @@ MoveEvent.fromMouseDown = function(
   instance.preventDefault = function() {
     event.preventDefault()
   }
-  instance.cancelable = event.cancelable
+  instance.cancelable = event.cancelable !== false
   instance.setDerivedProperties()
   return instance
 }
