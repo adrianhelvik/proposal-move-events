@@ -46,6 +46,14 @@ function getMoveHandler(element) {
   return moveHandlers.get(element)
 }
 
+function getTouchFromIdentifier(event, identifier) {
+  for (var i = 0; i < event.touches.length; i++) {
+    if (event.touches[i].identifier === identifier) {
+      return event.touches[i]
+    }
+  }
+}
+
 function mountMoveHandler(element, Move) {
   if (!element[_touchmove_]) {
     element[_touchmove_] = []
@@ -56,10 +64,11 @@ function mountMoveHandler(element, Move) {
     'touchstart',
     (element[_touchstart_] = function(event) {
       var move = initializeTouchMove(Move, event, element)
-      var touchIndex = event.touches.length - 1
+      var touch = event.touches[event.touches.length - 1]
+      var identifier = touch.identifier
 
-      var initialClientX = event.touches[touchIndex].clientX
-      var initialClientY = event.touches[touchIndex].clientY
+      var initialClientX = touch.clientX
+      var initialClientY = touch.clientY
       var previousEvent = event
 
       if (typeof move.onStart === 'function')
@@ -67,7 +76,7 @@ function mountMoveHandler(element, Move) {
           MoveEvent.fromTouchStart(
             event,
             element,
-            touchIndex,
+            identifier,
             initialClientX,
             initialClientY,
           ),
@@ -83,7 +92,7 @@ function mountMoveHandler(element, Move) {
               MoveEvent.fromTouchMove(
                 event,
                 element,
-                touchIndex,
+                identifier,
                 initialClientX,
                 initialClientY,
               ),
@@ -96,7 +105,9 @@ function mountMoveHandler(element, Move) {
       document.addEventListener(
         'touchend',
         (touchend = function(event) {
-          if (event.touches.length === touchIndex) {
+          var touch = getTouchFromIdentifier(event, identifier)
+
+          if (!touch) {
             document.removeEventListener('touchmove', touchmove)
             var index = element[_touchmove_].indexOf(touchmove)
             if (index !== -1) element[_touchmove_].splice(index, 1)
@@ -108,7 +119,7 @@ function mountMoveHandler(element, Move) {
                 MoveEvent.fromTouchEnd(
                   event,
                   element,
-                  touchIndex,
+                  identifier,
                   previousEvent,
                   initialClientX,
                   initialClientY,
@@ -211,7 +222,7 @@ function unmountMoveHandler(element) {
 function initializeTouchMove(Move, event, element) {
   var move = new Move()
   def(move, 'type', 'touch')
-  def(move, 'touchIndex', event.touches.length - 1)
+  def(move, 'identifier', event.touches.length - 1)
   def(move, 'element', element)
   return move
 }
@@ -219,7 +230,7 @@ function initializeTouchMove(Move, event, element) {
 function initializeMouseMove(Move, event, element) {
   var move = new Move()
   def(move, 'type', 'mouse')
-  def(move, 'touchIndex', null)
+  def(move, 'identifier', null)
   def(move, 'element', element)
   return move
 }
@@ -240,7 +251,7 @@ function MoveEvent() {
 MoveEvent.fromTouchStart = function(
   event,
   element,
-  touchIndex,
+  identifier,
   initialClientX,
   initialClientY,
 ) {
@@ -248,7 +259,7 @@ MoveEvent.fromTouchStart = function(
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
   instance.element = element
-  var touch = event.touches[touchIndex]
+  var touch = getTouchFromIdentifier(event, identifier)
   instance.extractInfoFromTouch(touch)
   instance.preventDefault = function() {
     event.preventDefault()
@@ -261,7 +272,7 @@ MoveEvent.fromTouchStart = function(
 MoveEvent.fromTouchMove = function(
   event,
   element,
-  touchIndex,
+  identifier,
   initialClientX,
   initialClientY,
 ) {
@@ -269,7 +280,7 @@ MoveEvent.fromTouchMove = function(
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
   instance.element = element
-  var touch = event.touches[touchIndex]
+  var touch = getTouchFromIdentifier(event, identifier)
   instance.extractInfoFromTouch(touch)
   instance.setDerivedProperties()
   return instance
@@ -278,7 +289,7 @@ MoveEvent.fromTouchMove = function(
 MoveEvent.fromTouchEnd = function(
   event,
   element,
-  touchIndex,
+  identifier,
   previousEvent,
   initialClientX,
   initialClientY,
@@ -287,7 +298,7 @@ MoveEvent.fromTouchEnd = function(
   instance.initialClientX = initialClientX
   instance.initialClientY = initialClientY
   instance.element = element
-  var touch = previousEvent.touches[touchIndex]
+  var touch = getTouchFromIdentifier(previousEvent, identifier)
   instance.extractInfoFromTouch(touch)
   instance.setDerivedProperties()
   return instance
