@@ -13,7 +13,9 @@ polyfill()
 
 element.moveHandler = class Move {
   onStart(event) {
-    event.preventDefault()
+    if (event.cancelable) {
+      event.preventDefault()
+    }
     this.snapshot = document.createSnapshot(this.element)
     this.element.style.opacity = 0
     this.initialX = event.snapshotX
@@ -59,7 +61,9 @@ import { setMoveHandler, createSnapshot } from 'proposal-move-events'
 
 setMoveHandler(element, class Move {
   onStart(event) {
-    event.preventDefault()
+    if (event.cancelable) {
+      event.preventDefault()
+    }
     this.snapshot = createSnapshot(this.element)
     this.element.style.opacity = 0
     this.initialX = event.snapshotX

@@ -48,7 +48,9 @@ body > :first-child {
     class Move {
       onStart(event) {
         console.log('onStart')
-        event.preventDefault()
+        if (event.cancelable) {
+          event.preventDefault()
+        }
         this.snapshot = document.createSnapshot(this.element)
         this.element.style.opacity = 0
         this.element.style.pointerEvents = 'none'
